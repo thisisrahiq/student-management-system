@@ -5,16 +5,23 @@ import { StatusBadge } from '@/components/Badge';
 import { formatDate } from '@/lib/utils';
 import { Award, Lock, CheckCircle2, Sparkles, GraduationCap } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function StudentResultsPage() {
-  const student = await prisma.student.findFirst({
-    include: { programme: true },
-    orderBy: { createdAt: 'asc' },
-  });
+  let student: any = null;
+
+  try {
+    student = await prisma.student.findFirst({
+      include: { programme: true },
+      orderBy: { createdAt: 'asc' },
+    });
+  } catch (err) {
+    console.error('Database connection error on Student Results Page:', err);
+  }
 
   if (!student) {
-    return <div className="p-8 text-center text-slate-500 glass-card rounded-2xl">No student profile found.</div>;
+    return <div className="p-8 text-center text-slate-500 glass-card rounded-2xl">No student profile found or database not connected.</div>;
   }
 
   // Fetch strictly published results

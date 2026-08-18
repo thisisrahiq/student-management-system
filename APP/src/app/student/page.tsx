@@ -5,30 +5,38 @@ import { StatusBadge } from '@/components/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { User, CreditCard, BookOpen, Award, ArrowRight, FileText, Sparkles, TrendingUp } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function StudentDashboardPage() {
-  // Fetch active student for demo (Alice Walker)
-  const student = await prisma.student.findFirst({
-    include: {
-      programme: true,
-      fee: {
-        include: { payments: { orderBy: { paymentDate: 'desc' } } },
-      },
-      submissions: {
-        include: {
-          assessment: { include: { module: true } },
-          result: true,
+  let student: any = null;
+
+  try {
+    // Fetch active student for demo (Alice Walker)
+    student = await prisma.student.findFirst({
+      include: {
+        programme: true,
+        fee: {
+          include: { payments: { orderBy: { paymentDate: 'desc' } } },
+        },
+        submissions: {
+          include: {
+            assessment: { include: { module: true } },
+            result: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+      orderBy: { createdAt: 'asc' },
+    });
+  } catch (err) {
+    console.error('Database connection error on Student Dashboard:', err);
+  }
 
   if (!student) {
     return (
       <div className="p-8 text-center glass-card rounded-2xl">
-        <p className="text-slate-500">No student profiles found. Please seed the database.</p>
+        <p className="text-slate-500 font-semibold">No student profiles found or database not connected.</p>
+        <p className="text-xs text-slate-400 mt-1">Ensure DATABASE_URL is configured and run `npx prisma db seed`.</p>
       </div>
     );
   }

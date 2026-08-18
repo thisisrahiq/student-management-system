@@ -5,21 +5,28 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, History, CheckCircle2, TrendingUp, Wallet } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function StudentFeesPage() {
-  const student = await prisma.student.findFirst({
-    include: {
-      programme: true,
-      fee: {
-        include: { payments: { orderBy: { paymentDate: 'desc' } } },
+  let student: any = null;
+
+  try {
+    student = await prisma.student.findFirst({
+      include: {
+        programme: true,
+        fee: {
+          include: { payments: { orderBy: { paymentDate: 'desc' } } },
+        },
       },
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+      orderBy: { createdAt: 'asc' },
+    });
+  } catch (err) {
+    console.error('Database connection error on Student Fees Page:', err);
+  }
 
   if (!student || !student.fee) {
-    return <div className="p-8 text-center text-slate-500 glass-card rounded-2xl">No fee record found.</div>;
+    return <div className="p-8 text-center text-slate-500 glass-card rounded-2xl">No fee record found or database not connected.</div>;
   }
 
   const assigned = Number(student.fee.assignedAmount);

@@ -24,3 +24,4 @@
 # Uploads
 **/public/uploads/*
 !**/public/uploads/.gitkeep
+.env*

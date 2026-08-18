@@ -17,39 +17,56 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export const revalidate = 0; // Dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function StaffDashboardPage() {
-  const totalStudents = await prisma.student.count();
-  const enrolledStudents = await prisma.student.count({ where: { status: 'ENROLLED' } });
-  const deferredStudents = await prisma.student.count({ where: { status: 'DEFERRED' } });
-  
-  const feeRecords = await prisma.fee.findMany({
-    include: {
-      student: { include: { programme: true } },
-    },
-  });
+  let totalStudents = 0;
+  let enrolledStudents = 0;
+  let deferredStudents = 0;
+  let feeRecords: any[] = [];
+  let totalAssignedFee = 0;
+  let totalPaid = 0;
+  let totalOutstanding = 0;
+  let overdueFeeRecords: any[] = [];
+  let totalAssessments = 0;
+  let pendingResultsCount = 0;
+  let recentPayments: any[] = [];
 
-  const totalAssignedFee = feeRecords.reduce((acc, f) => acc + Number(f.assignedAmount), 0);
-  const totalPaid = feeRecords.reduce((acc, f) => acc + Number(f.totalPaid), 0);
-  const totalOutstanding = totalAssignedFee - totalPaid;
+  try {
+    totalStudents = await prisma.student.count();
+    enrolledStudents = await prisma.student.count({ where: { status: 'ENROLLED' } });
+    deferredStudents = await prisma.student.count({ where: { status: 'DEFERRED' } });
+    
+    feeRecords = await prisma.fee.findMany({
+      include: {
+        student: { include: { programme: true } },
+      },
+    });
 
-  const overdueFeeRecords = feeRecords.filter(
-    (f) => Number(f.assignedAmount) > Number(f.totalPaid)
-  );
+    totalAssignedFee = feeRecords.reduce((acc, f) => acc + Number(f.assignedAmount), 0);
+    totalPaid = feeRecords.reduce((acc, f) => acc + Number(f.totalPaid), 0);
+    totalOutstanding = totalAssignedFee - totalPaid;
 
-  const totalAssessments = await prisma.assessment.count();
-  const pendingResultsCount = await prisma.submission.count({
-    where: {
-      result: null,
-    },
-  });
+    overdueFeeRecords = feeRecords.filter(
+      (f) => Number(f.assignedAmount) > Number(f.totalPaid)
+    );
 
-  const recentPayments = await prisma.payment.findMany({
-    take: 5,
-    orderBy: { paymentDate: 'desc' },
-    include: { student: true },
-  });
+    totalAssessments = await prisma.assessment.count();
+    pendingResultsCount = await prisma.submission.count({
+      where: {
+        result: null,
+      },
+    });
+
+    recentPayments = await prisma.payment.findMany({
+      take: 5,
+      orderBy: { paymentDate: 'desc' },
+      include: { student: true },
+    });
+  } catch (err) {
+    console.error('Database connection error on Staff Dashboard:', err);
+  }
 
   // Get greeting based on time
   const hour = new Date().getHours();
