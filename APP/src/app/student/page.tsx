@@ -48,7 +48,7 @@ export default async function StudentDashboardPage() {
 
   // Published results only
   const publishedSubmissions = student.submissions.filter(
-    (s) => s.result && s.result.isPublished
+    (s: any) => s.result && s.result.isPublished
   );
 
   return (
@@ -176,7 +176,7 @@ export default async function StudentDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {publishedSubmissions.map((sub, i) => (
+                {publishedSubmissions.map((sub: any, i: number) => (
                   <tr key={sub.id} className="hover:bg-sky-50/50 transition-colors row-animate" style={{ animationDelay: `${i * 60}ms` }}>
                     <td className="font-mono text-xs font-bold text-slate-700">{sub.assessment.module.code}</td>
                     <td className="font-semibold text-slate-900">{sub.assessment.title}</td>

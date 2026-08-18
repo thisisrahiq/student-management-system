@@ -30,7 +30,7 @@ export default async function StudentResultsPage() {
 
   // Calculate average score
   const avgScore = results.length > 0
-    ? results.reduce((acc, r) => acc + r.numericGrade, 0) / results.length
+    ? results.reduce((acc: number, r: any) => acc + r.numericGrade, 0) / results.length
     : null;
 
   return (
@@ -119,7 +119,7 @@ export default async function StudentResultsPage() {
                 </tr>
               </thead>
               <tbody>
-                {results.map((r, i) => (
+                {results.map((r: any, i: number) => (
                   <tr key={r.id} className="hover:bg-sky-50/50 transition-colors row-animate" style={{ animationDelay: `${i * 60}ms` }}>
                     <td>
                       <div className="font-bold text-slate-900">{r.submission.assessment.module.code}</div>

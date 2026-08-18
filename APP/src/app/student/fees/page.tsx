@@ -114,7 +114,7 @@ export default async function StudentFeesPage() {
           </div>
         ) : (
           <div className="space-y-2.5">
-            {student.fee.payments.map((p, i) => (
+            {student.fee.payments.map((p: any, i: number) => (
               <div
                 key={p.id}
                 className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-slate-50/80 to-white border border-slate-100/80 hover-lift row-animate"
